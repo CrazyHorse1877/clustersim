@@ -1,0 +1,10 @@
+#!/usr/bin/perl -w
+
+$sum = $n = 0;
+while(<>) {
+	$n++;
+	$sum+=$_;
+}
+
+print $sum/$n, "\n";
+

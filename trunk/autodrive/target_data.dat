@@ -1,0 +1,78 @@
+Targets: 1
+
+target 1
+==========================
+
+Starting point(m) : 0,0
+
+Starting Height(m) : 0.0
+Starting angle(deg from east) : 0.0
+Starting velocity(m/s) : 0.1
+
+Minimum Velocity(m/s) : 0.0
+Maximum Velocity(m/s) : 0.1
+
+Target Mass(kg) : 250
+
+Steering at Minimum Velocity(pi rad/s) : 1
+Steering at Maximum Velocity(pi rad/s) : 0.03
+
+Uncertainty: 600,600
+
+target 2
+==========================
+
+Starting point(m) : 10,-15
+
+Starting Height(m) : 0.0
+Starting angle(deg from east) : 0.0
+Starting velocity(m/s) : 0.1
+
+Minimum Velocity(m/s) : 0.0
+Maximum Velocity(m/s) : 0.1
+
+Target Mass(kg) : 250
+
+Steering at Minimum Velocity(pi rad/s) : 1
+Steering at Maximum Velocity(pi rad/s) : 0.03
+
+Uncertainty: 60,60
+
+target 3
+==========================
+
+Starting point(m) : -15,-16
+
+Starting Height(m) : 0.0
+Starting angle(deg from east) : 0.0
+Starting velocity(m/s) : 0.1
+
+Minimum Velocity(m/s) : 0.0
+Maximum Velocity(m/s) : 0.1
+
+Target Mass(kg) : 250
+
+Steering at Minimum Velocity(pi rad/s) : 1
+Steering at Maximum Velocity(pi rad/s) : 0.03
+
+Uncertainty: 60,60
+
+target 4
+==========================
+
+Starting point(m) : -16,19
+
+Starting Height(m) : 0.0
+Starting angle(deg from east) : 0.0
+Starting velocity(m/s) : 0.1
+
+Minimum Velocity(m/s) : 0.0
+Maximum Velocity(m/s) : 0.1
+
+Target Mass(kg) : 250
+
+Steering at Minimum Velocity(pi rad/s) : 1
+Steering at Maximum Velocity(pi rad/s) : 0.03
+
+Uncertainty: 60,60
+

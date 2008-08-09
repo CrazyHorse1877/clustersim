@@ -1,0 +1,17 @@
+#include <stdlib.h>
+#include "file_output.h"
+#include "parse_arg.h"
+
+int main(int argc, char* argv[]){
+	char** name_map = new_standard_name_map();
+	char** usage_map = new_standard_usage_map();
+
+	char* server_host = get_arg(argc, argv, "server_host", name_map, usage_map).values[0];
+	int server_port = atoi(get_arg(argc, argv, "server_port", name_map, usage_map).values[0]);
+		
+	//output_flight_info_to_file("localhost", 6969);
+	output_flight_info_to_file(server_host, server_port);
+
+	return 0;
+}
+

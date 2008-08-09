@@ -1,0 +1,467 @@
+////////////////////////////////////////////
+//
+// vehicle.cpp
+//
+// Part of Bayesian Search and Rescue Simulator 
+//
+// This functions control the movement of the vehicle 
+// 
+// Copyright (c) Phil Sammons
+// UNIVERSITY OF NEW SOUTH WALES (Sydney, Australia)
+// 
+// Parameters
+//-----------------------------------------
+// Dependant Files : move_vehicles.hpp
+// 
+////////////////////////////////////////////
+
+#include "move_vehicles.hpp"
+
+using namespace std;
+
+//Vehicle::Vehicle(void){return;}
+//Vehicle::~Vehicle(void){return;}
+
+/*Vehicle::Vehicle(Object_Data VD[], Object_Data SD[],
+  Object_Data TD[], Object_Data PD[],
+  Object_Data GD)
+  {
+  for(int i=0; i < 5 ; i++)
+  {
+  _VD[i] = VD[i];
+  _SD[i] = SD[i];
+  _TD[i] = TD[i];
+  _PD[i] = PD[i];
+  }
+  _GD = GD;
+  }
+*/
+
+
+//----------------------------------------------------------------	\
+//  MOVE VEHICLES -							\
+//----------------------------------------------------------------/
+void Vehicle::move_with_lookahead(GridPDF *&gridobject, double timestamp)
+{
+  double static old_time = 0;
+  double timestep = timestamp - old_time;
+
+  for(int vehicle = 1 ; 
+      vehicle <  gridobject->VD[0].numObjects ; vehicle++ )
+    {
+      Vector pos(2);
+      Vector next(2);
+      double sum;
+      double nextX, nextY, heading; 
+      double current_val, next_val, next_head;
+      double line = 10; //2 * sqrt(SD[vehicle].vy);
+      double distance =  gridobject->VD[vehicle].v0 + line ;
+      int lookaheads = 10;
+      int resolution = 100;
+      int heading_set = 0;
+      Vector next_cords(2);
+      Vector final_pos(2);
+      
+      //GET CURRENT POSITION
+       
+       pos(0) =  gridobject->VD[vehicle].x0-gridobject->GD->xmin;
+       pos(1) =  gridobject->VD[vehicle].y0-gridobject->GD->ymin;
+      
+      
+      for(int i=0 ; i < resolution ; i++)
+	{
+	  //get original position
+	}
+      
+      
+      //GET MAX STEERING RATE SET BY VEHICLE MODEL
+      double max_theta =  gridobject->VD[vehicle].tminv - 
+	( (  gridobject->VD[vehicle].v0 / (gridobject->VD[vehicle].vmax-
+					   gridobject->VD[vehicle].vmin) ) 
+	  * (gridobject->VD[vehicle].tminv-gridobject->VD[vehicle].tmaxv) );
+      double dtheta = max_theta / resolution;
+      
+      //Matrix treevalues(resolution,lookaheads);
+      //Vector values(resolution*lookaheads);
+      
+      //int branch = 10;
+      //int node = 10;
+      
+      //find path given number of steps
+      //start at minimum angle, iterate to maximum given resolution
+      //store step number location and value in tree
+      //move to next step 
+      
+      //if layer = steps then stop and count back
+      //
+      
+      
+      double best_value = 0;
+      //for(int resoloution = 0 ; l < 100 ; l++ )
+      //{
+      best_value += get_best_direction
+	(max_theta,lookaheads, pos, final_pos, vehicle, heading,
+	 current_val, distance, line, next_head, next_val, next,
+	 heading_set, dtheta, gridobject, timestep);
+      
+      cout << "best value" << best_value <<
+	"     heading" << next_head << endl;
+      
+      //if(lookaheads > 200)throw 21;
+      //     if(heading_set)break;
+      
+      //}
+      
+      cout << "next_val" << next_val << "   pos: " <<
+	pos(0) << "," << pos(1) << endl;     	
+      
+      //for( int i = node ; i > 0 ; i-- )
+      //tree ( branch , i , values , pos , theta);
+      
+      //MOVE VEHICLE TO NEW POINT
+       gridobject->VD[vehicle].x0 = next(0) +  gridobject->GD->xmin;
+       gridobject->VD[vehicle].y0 = next(1) +  gridobject->GD->ymin;
+       gridobject->VD[vehicle].th0 = next_head;
+    }
+}
+
+double Vehicle::get_max_timestep(double rad_at_max_v, double rad_at_min_v,
+				 double velocity,double minimum_velocity,
+				 double maximum_velocity)
+{
+  return 2*M_PI*(((rad_at_max_v - rad_at_min_v)*(velocity-minimum_velocity))
+		 /(minimum_velocity - maximum_velocity) + rad_at_max_v)/velocity;
+}
+
+double Vehicle::add_points(Vector &pos, double velocity, double timestep, 
+			   double max_velocity, double min_velocity,
+			   double rad_at_max_v, double rad_at_min_v)
+{
+  int sweep_res = 1;
+  double R = (velocity / (max_velocity - min_velocity))*
+    (rad_at_max_v - rad_at_min_v); // max turn_radius
+  double S = timestep * velocity; // Arc_Length
+  double theta = S / R; 
+
+  for(int r = 0 ; r <= R ; r =+ sweep_res)
+  double k = r - (R * cos(theta)); // X offset
+  double j = R * cos(theta); // Y offset 
+}
+
+
+
+double Vehicle::get_best_direction(double max_theta, int &lookaheads,
+				   Vector &pos, Vector &final_pos,
+				   int vehicle, double &heading,
+				   double &current_val, double distance,
+				   double line, double &next_head,
+				   double &next_val, Vector &next,
+				   int &heading_set, double &dtheta,
+				   GridPDF *&gridobject, double timestep)
+{
+   //GET CURRENT VALUE
+   current_val = get_value2(*gridobject->GD, gridobject->VD[vehicle], pos,
+			    gridobject->VD[vehicle].th0, -max_theta,
+			    lookaheads, final_pos);
+
+   //SET CURRENT AS BEST CHOICE
+   set_new_position(gridobject->VD[vehicle], pos, -max_theta, heading,
+		    current_val, next_val, next, heading_set, distance,
+		    line, next_head, timestep);
+   
+   heading_set = 0;//look fer better solution
+   
+   //FOR LOOP FROM MINIMUM STEERING ANGLE TO MAXIMUM
+   for(double steer_angle = -max_theta+dtheta ; steer_angle <=
+	 max_theta ; steer_angle += dtheta )
+     {
+       //GET NEXT VALUE
+       next_val = get_value2(*gridobject->GD, gridobject->VD[vehicle], pos,
+			     gridobject->VD[vehicle].th0, steer_angle,
+			     lookaheads, final_pos);
+       
+       //IF NEW VALUE IS BIGGER, SET NEW POSITION AND HEADING AS BEST CHOICE
+       if (next_val > current_val)
+	 {
+	   set_new_position(gridobject->VD[vehicle], pos, steer_angle,
+			    gridobject->VD[vehicle].th0, current_val,
+			    next_val, next, heading_set, distance, line,
+			    next_head, timestep);
+	 }
+     }
+   
+   //IF NO HEADING HAS BEEN SET
+   //EITHER -max_theta IS THE BEST HEADING OR ALL VALUES ARE EQUAL
+   if(heading_set == 0)
+     {
+       //COMPAIR ANOTHER VALUE
+       next_val = get_value2(*gridobject->GD, gridobject->VD[vehicle], pos,
+			     gridobject->VD[vehicle].th0, 0.0, lookaheads,
+			     final_pos);
+       
+       //IF SAME - ALL VALUES ARE EQUAL . INCREASE SEARCH AREA
+       if(next_val == current_val)
+	 {
+	   //cout << "I'm lost - step distance = " << lookaheads << endl;
+	   lookaheads++;
+	 }
+       else
+	 //HEADING IS OK
+	 set_new_position(gridobject->VD[vehicle], pos, -max_theta,
+			  gridobject->VD[vehicle].th0, current_val, next_val,
+			  next, heading_set, distance, line, next_head,
+			  timestep);
+     }
+   return current_val;
+}
+
+void Vehicle::tree( int branch , int node, Matrix &values,
+		    Vector pos , double theta, Object_Data *&GD)
+{
+  cout << "branch " << branch << "     node " << node << endl;
+  
+  Vector cords(2);
+  //GET COORINATES OF NEXT POINT
+  cords(0) = pos(0) + (cos(theta*M_PI/180));
+  cords(1) = pos(1) + (sin(theta*M_PI/180));
+  
+  //GET VALUE OF POINT + // validate point
+  if( (int)cords(0) <  GD->xsize && (int)cords(0) >=0 &&
+      (int)cords(1) <  GD->ysize && (int)cords(1) >=0)
+    {
+      values(branch,node) =  get_value(*GD, pos, theta, 1.5);
+    }
+  
+  if ( branch > 1 ) tree ( branch - 1 , node, values, pos , theta, GD);
+}
+
+
+//----------------------------------------------------------------	\
+//  MOVE VEHICLES -							\
+//----------------------------------------------------------------/
+void Vehicle::move_vehicles(GridPDF gridobject, double timestamp)
+{
+  static double old_time = 0;
+  
+  for(int vehicle = 0 ; vehicle <  gridobject.VD[0].numObjects ; vehicle++ )
+    {
+      Vector pos(2);
+      Vector next(2);
+      double line = 15;//2 * sqrt(SD[vehicle].vy);
+      double sum;
+      double nextX, nextY, heading; 
+      double current_val, next_val, next_head;
+      double look =  gridobject.VD[vehicle].v0 + line ;
+      int heading_set = 0;
+      double timestep = timestamp - old_time;if(!timestep)break;
+      old_time = timestamp;
+       const char *p ;
+
+       double start_long = 151.17;
+       double start_lat = -33.94;
+       
+       
+       //FGFSSocket uav1("192.168.0.50", 5400);
+       FGFSSocket uav1("localhost", 5400);
+       uav1.write("get /position/longitude-deg");
+       p = uav1.read();
+       sscanf(p,"%lf",&gridobject.VD[vehicle].gps_long);
+       uav1.write("get /position/latitude-deg");
+       p = uav1.read();
+       sscanf(p,"%lf",&gridobject.VD[vehicle].gps_lat);
+       uav1.write("get /position/altitude-ft");
+       p = uav1.read();
+       sscanf(p,"%lf",&gridobject.VD[vehicle].gps_elev);
+       uav1.write("get /orientation/heading-deg");
+       p = uav1.read();
+       sscanf(p,"%lf",&gridobject.VD[vehicle].th0);
+       
+	 
+       pos(0) =  (gridobject.VD[vehicle].gps_long - start_long) * 1000;
+       pos(1) =  (gridobject.VD[vehicle].gps_lat - start_lat) * 1000;
+
+//       pos(0) =  gridobject.VD[vehicle].x0-gridobject.GD->xmin;
+//       pos(1) =  gridobject.VD[vehicle].y0-gridobject.GD->ymin;
+      
+      for(int l = 0 ; l < 100 ; l++ )
+	{
+	  // TEST TO GET VALUE AT ANGLE 0 AND DISTANCE "LOOK".
+	  current_val = get_value(*gridobject.GD, pos, 0.0, look);
+	  double theta = 0;
+	  for(int i = 0 ; i <= 360 ; i ++ )
+	    {
+	      //GET VALUES UP TO DISTANCE "LOOK"
+	      next_val = get_value(*gridobject.GD, pos, theta, look);
+	      
+	      //IF NEW VALUE IS BIGGER, SET NEW POSITION
+	      if (next_val > current_val){
+		 set_new_position(gridobject.VD[vehicle], pos, theta,
+				  gridobject.VD[vehicle].th0, current_val,
+				  next_val, next, heading_set, look,
+				  line, next_head, timestep);
+	      }
+	      theta += 1;
+	    }
+	  //IF NO HEADING HAS BEEN SET
+	  //EITHER 0 IS THE BEST HEADING OR ALL VALUES ARE EQUAL
+	  if(heading_set == 0)
+	    {
+	      //COMPAIR ANOTHER VALUE
+	      next_val = get_value(*gridobject.GD, pos, 180, look);
+	      
+	      if(next_val == current_val)
+		//IF SAME - ALL VALUES ARE EQUAL . INCREASE SEARCH AREA
+		{
+		  look++;
+		}
+	      else
+		//HEADING IS OK
+		set_new_position(gridobject.VD[vehicle], pos,0 ,heading,
+				 current_val, next_val, next, heading_set,
+				 look, line, next_head, timestep);
+	    }
+	  if(look > 200)throw 21;
+	  if(heading_set)break;
+	}
+
+       double nextwplong = next(0);///1000)+start_long;
+       double nextwplat = next(1);///1000)+start_lat; 
+	 
+       cout << "lat: " << nextwplong << "  long: " << nextwplat << endl;
+       
+      //MOVE VEHICLE TO NEW POINT
+       gridobject.VD[vehicle].x0 = pos(0);
+       gridobject.VD[vehicle].y0 = pos(1);
+       uav1.write("set /autopilot/route-manager/input @clear");
+       uav1.write("set /autopilot/route-manager/input @insert-1:%lf,%lf@600",nextwplong, nextwplat);
+//       gridobject.VD[vehicle].x0 = next(0) +  gridobject.GD->xmin;
+//       gridobject.VD[vehicle].y0 = next(1) +  gridobject.GD->ymin;
+       gridobject.VD[vehicle].th0 = next_head;
+    }
+}
+
+//----------------------------------------------------------------	\
+//   STEER - DECIDES REAL STEERING ANGLE			 	\
+//----------------------------------------------------------------/
+double Vehicle::steer(Object_Data &OD, double request_theta)
+{
+  double steer_angle;
+  
+  //relative desired steer angel
+  double alpha_angle = request_theta - OD.th0;
+  
+  //variable steer angle depending on speed
+  double max_turn = OD.tminv - ( ( OD.v0 / (OD.vmax-OD.vmin) ) *
+				 (OD.tminv-OD.tmaxv) );
+  
+  //get alpha into correct quadrants
+  if(alpha_angle > 180)  alpha_angle = alpha_angle - 360;
+  if(alpha_angle < -180) alpha_angle = alpha_angle + 360;
+  
+  //limit steering to maximun steering rate
+  if(alpha_angle > max_turn) alpha_angle = OD.th0 + max_turn;
+  else
+    {
+      if(alpha_angle < -max_turn) alpha_angle = OD.th0 - max_turn;
+      else alpha_angle = OD.th0 + alpha_angle;
+    }
+  
+  //return new heading angle
+  return alpha_angle;
+}
+
+//----------------------------------------------------------------	\
+//  get_value - RETURNS THE SUM OF THE VALUES ALONG A LINE @ THETA	\
+//----------------------------------------------------------------/
+double Vehicle::get_value(Object_Data &OD,Vector &pos,
+			  double theta, double step)
+{
+  Vector next_cords(2);
+  double sum = 0;
+  for(int i = 0 ; i < step ; i++)
+    {
+      //GET COORINATES OF NEXT POINT
+      next_cords(0) = pos(0) + ((i+0.5) * cos(theta*M_PI/180));
+      next_cords(1) = pos(1) + ((i+0.5) * sin(theta*M_PI/180));
+      
+      //GET VALUE OF POINT + // validate point
+      if( (int)next_cords(0) < OD.xsize && (int)next_cords(0) >=0 &&
+	  (int)next_cords(1) < OD.ysize && (int)next_cords(1) >=0)
+	sum = sum + OD.global_target((int)next_cords(0), (int)next_cords(1));
+    }
+  
+  //RETURN SUM OF VALUES ALONG LINE
+  return sum;
+}
+
+//----------------------------------------------------------------	\
+  //  get_value2 - RETURNS THE SUM OF THE VALUES ALONG A CURVE		\
+//----------------------------------------------------------------/
+  double Vehicle::get_value2(Object_Data &GOD, Object_Data &VOD, Vector pos,
+			     double heading, double theta, int lookaheads,
+			     Vector &final_pos)
+{
+  Vector next_cords(2);
+  double sum = 0;
+  
+  
+  for(int i = 0 ; i < lookaheads ; i++)
+    {
+      //GET COORINATES OF NEXT POINT
+      //next_cords(0) = pos(0) + ((VOD.v0) * 
+      //cos(((heading+(theta))*M_PI/180)));
+      //next_cords(1) = pos(1) + ((VOD.v0) * 
+      //sin(((heading+(theta))*M_PI/180)));
+      next_cords(0) = pos(0) + 
+	((VOD.v0) * cos(((heading+(theta/lookaheads))*M_PI/180)));
+      next_cords(1) = pos(1) + 
+	((VOD.v0) * sin(((heading+(theta/lookaheads))*M_PI/180)));
+      
+      //GET VALUE OF POINT + // validate point
+      if( (int)next_cords(0) < GOD.xsize && (int)next_cords(0) >=0 &&
+	  (int)next_cords(1) < GOD.ysize && (int)next_cords(1) >=0)
+	sum = sum + GOD.global_target((int)next_cords(0), (int)next_cords(1));
+      
+      heading += theta/lookaheads; 
+      pos(0) = pos(0) + ((VOD.v0) * cos(((heading+(theta))*M_PI/180)));
+      pos(1) = pos(0) + ((VOD.v0) * cos(((heading+(theta))*M_PI/180)));
+    }
+  final_pos(0) = pos(0);
+  final_pos(1) = pos(1);
+  
+  //RETURN SUM OF VALUES ALONG LINE   
+  return sum;
+}
+
+//----------------------------------------------------------------	\
+//  get_new_pos - RETURNS THE COORDS OF NEW POSITION GIVEN  THETA	\
+//----------------------------------------------------------------/
+Vector Vehicle::get_new_pos(Vector &pos, double theta,
+			    double velocity, double timestep)
+{
+  Vector next_pos(2);
+   next_pos(0) = pos(0) + ((velocity * timestep) * cos(theta*M_PI/180) * 0.001)+151.17;
+   next_pos(1) = pos(1) + ((velocity * timestep) * sin(theta*M_PI/180) * 0.001)+-33.94;
+   return next_pos;
+}
+
+//----------------------------------------------------------------	\
+//  SET VALUES FOR THE NEXT VEHICLE POSITION				\
+//----------------------------------------------------------------/
+void Vehicle::set_new_position(Object_Data &OD, Vector &pos, double theta,
+			       double &heading, double &current_val,
+			       double next_val, Vector &next, 
+			       int &heading_set, double &look , double line,
+			       double &next_head, double timestep)
+{
+   // GET NEW HEADING
+  //next_head = heading + theta;
+  next_head = theta;
+  // SET NEW POSITION  
+  next = get_new_pos(pos, heading, OD.v0, timestep);
+  // SET AS DESIRED DIRECTION
+  current_val = next_val;
+  //RESET LOOK
+  look = OD.v0 + line;
+  heading_set = 1;
+}
