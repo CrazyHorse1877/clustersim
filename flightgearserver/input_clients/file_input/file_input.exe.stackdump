@@ -1,0 +1,13 @@
+Exception: STATUS_ACCESS_VIOLATION at eip=610ECE82
+eax=00000001 ebx=00000001 ecx=0022D008 edx=00000064 esi=00000000 edi=00000400
+ebp=0022C7D8 esp=0022C7A0 program=C:\cygwin\home\Marie Kazacos\thesis\program\input_clients\file_input\file_input.exe, pid 4348, thread main
+cs=001B ds=0023 es=0023 fs=003B gs=0000 ss=0023
+Stack trace:
+Frame     Function  Args
+0022C7D8  610ECE82  (0022D008, 0022C810, 00000001, 00000400)
+0022C7F8  610ED11F  (0022C810, 00000001, 00000400, 00000000)
+0022CC48  61092D88  (00000002, 00670650, 00670768, 00001770)
+0022CCE8  004015BD  (00000005, 61169088, 00670090, 0022CC70)
+0022CD98  61006198  (00000000, 0022CDD0, 61005510, 0022CDD0)
+61005510  61004416  (0000009C, A02404C7, E8611001, FFFFFF48)
+      5 [main] file_input 4348 _cygtls::handle_exceptions: Error while dumping state (probably corrupted stack)

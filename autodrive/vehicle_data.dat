@@ -1,0 +1,77 @@
+Vehicles: 1
+
+Vehicle 1
+==========================
+
+Starting point(m) : -50,-50
+
+Starting Height(m) : 40.0
+Starting angle(deg from east) : 0.0
+Starting velocity(m/s) : 1.0
+
+Minimum Velocity(m/s) : 0.0
+Maximum Velocity(m/s) : 1.0
+
+Vehicle Weight(kg) : 0.5
+
+Steering at min Velocity: 0
+Steering at max velocity: 10.0
+
+Variance of sensor: 1,1
+
+Vehicle 2
+==========================
+
+Starting point(m) : -50,0
+
+Starting Height(m) : 10.0
+Starting angle(deg from east) : 0.0
+Starting velocity(m/s) : 0.01
+
+Minimum Velocity(m/s) : 0.0
+Maximum Velocity(m/s) : 3.0
+
+Vehicle Weight(kg) : 1
+
+Steering at min Velocity: 90.0
+Steering at max velocity: 5.0
+
+Variance of sensor: 1,1
+
+Vehicle 3
+==========================
+
+Starting point(m) : -50,0
+
+Starting Height(m) : 1.0
+Starting angle(deg from east) : 0.0
+Starting velocity(m/s) : 0.01
+
+Minimum Velocity(m/s) : 0.0
+Maximum Velocity(m/s) : 3.0
+
+Vehicle Weight(kg) : 1
+
+Steering at min Velocity: 90.0
+Steering at max velocity: 5.0
+
+Variance of sensor: 10,10
+
+Vehicle 4
+==========================
+
+Starting point(m) : -50,0
+
+Starting Height(m) : 1.0
+Starting angle(deg from east) : 0.0
+Starting velocity(m/s) : 0.01
+
+Minimum Velocity(m/s) : 0.0
+Maximum Velocity(m/s) : 3.0
+
+Vehicle Weight(kg) : 1
+
+Steering at min Velocity: 90.0
+Steering at max velocity: 5.0
+
+Variance of sensor: 10,10

@@ -1,0 +1,22 @@
+#!/usr/bin/perl -w
+
+@file = <>;
+
+$stddev = $sum = $n = 0;
+foreach(@file) {
+	$n++;
+	$sum+=$_;
+}
+$avg = $sum/$n;
+foreach(@file) {
+	chomp;
+	$stddev += abs($_ - $avg)**2;
+	print $_, " " , $avg, " ", abs($_ - $avg)**2, "\n";
+}
+
+$stddev /= ($n - 1);
+
+$stddev = sqrt($stddev);
+
+print $avg, " ", $stddev, "\n";
+
