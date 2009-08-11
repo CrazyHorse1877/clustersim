@@ -32,8 +32,8 @@
 #include <cassert>
 #include <stdlib.h>
 
-#include <ulapack/matrix_types.hpp>
-#include <ulapack/scalar_fill.hpp>
+//#include <ulapack/matrix_types.hpp>
+//#include <ulapack/scalar_fill.hpp>
 
 #include <gsl/gsl_blas.h>
 #include <gsl/gsl_rng.h>
