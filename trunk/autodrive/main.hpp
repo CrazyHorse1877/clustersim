@@ -6,7 +6,7 @@
 #include "grid_pdf.hpp"
 #include "object_data.hpp"
 #include "move_vehicles.hpp"
-#include "gnuplot_i.hpp"
+//#include "gnuplot_i.hpp"
 #include "fgcontroller.hpp"
 //#include "opengl_3d.hpp"
 
