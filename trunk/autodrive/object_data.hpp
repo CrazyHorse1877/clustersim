@@ -25,8 +25,8 @@
 #include <cassert>
 #include <stdlib.h>
 
-#include <ulapack/matrix_types.hpp>
-#include <ulapack/scalar_fill.hpp>
+//#include <ulapack/matrix_types.hpp>
+//#include <ulapack/scalar_fill.hpp>
 
 //Retain ANSI/ISO Compability
 #ifdef WIN32
@@ -34,8 +34,7 @@
 #endif
 
 using namespace std;
-using namespace ulapack;
-
+//using namespace ulapack;
 
 class Object_Data
 {
