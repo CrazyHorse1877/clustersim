@@ -1,0 +1,7 @@
+Mainfest-Version: 1.0
+Extension-Name: fginterface
+Class-Manager: FGWaypointExtension
+NetLogo-Extension-API-Version: 4.1
+
+
+
