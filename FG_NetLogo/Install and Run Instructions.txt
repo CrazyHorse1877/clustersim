@@ -1,0 +1,32 @@
+TO INSTALL THE EXTENSION
+------------------------
+Copy fginterface.jar and FGInterface.properties to $NetLogoIntallDir/extensions/fginterface 
+creating directories as necessary.
+
+
+TO RUN THE DEMO
+----------------
+1. Open the NetLogo project FGInterfaceDemo.nlogo
+2. Start as many Flight Gear instances as required, on the same machine or one connected
+   via LAN. NOTE: The --telnet=<port number> option must be specified for the interface
+   to communicate with flight gear.
+3. Set the number-of-fg-instances in Net Logo according to the number of instances 
+   started.
+4. In the flight-gear-interface-properties window in Net Logo, specify the name and 
+   telnet port number of each of the flight gear instances:
+    a. Only lines without a # symbol at their beginning will have any effect.
+    b. Set the properties as <name>=<server-name>:<port number> (some examples are 
+       pre-populated) where <name> is only for your reference and <server-name> is the
+       DNS name (or IP address) of the flight gear instance.
+5. Ensure the control flight gear switch is set to ON
+6. Click the setup button, you should see each of the flight gear instances take off and
+   begin to gain altitude.
+7. Wait for the craft to reach cruising altitude, then push the go button. This will 
+   begin the Net Logo simulation, which will in turn
+   control the flight gear instances.
+
+NOTE: I included a perl script in the src folder which I used to launch two Flight Gear instances
+      on my local machine. If you want to use this it will need some modification, because I made a
+      custom airport called VG001 which is located on the Village Green. Other modifications would
+      also be necessary depending on you OS install location etc.
+
